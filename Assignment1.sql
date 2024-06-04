@@ -66,4 +66,39 @@ group by SalesOrderID;
 select SalesOrderID,MIN(OrderQty) as MinQty , MAX(OrderQty) as MaxQt from saleslt.SalesOrderDetail
 group by SalesOrderID;
 
+15. Get a list of all managers and total number of employees who report to them.
+SELECT EmployeeNationalIDAlternateKey, COUNT(*) AS NumberOfReports
+FROM dbo.DimEmployee
+WHERE Title like '%Manager' and EmployeeNationalIDAlternateKey IS NOT NULL 
+GROUP BY EmployeeNationalIDAlternateKey;
+
+16. Get the OrderID and the total quantity for each order that has a total quantity of greater than 300
+SELECT SalesOrderID, SUM(OrderQty) AS TotalOrderQty
+FROM SalesLT.SalesOrderDetail
+GROUP BY SalesOrderID
+having SUM(OrderQty) > 300;
+
+17. list of all orders placed on or after 1996/12/31
+select SalesOrderID from SalesLT.SalesOrderHeader
+where OrderDate >='1996-12-31'
+
+18. list of all orders shipped to Canada
+select * 
+from SalesLT.Address
+join SalesLT.SalesOrderHeader
+on SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID
+where CountryRegion = 'Canada' ;
+
+19. list of all orders with order total > 200
+select SalesOrderID,SUM(OrderQty*UnitPrice) as TotalAmount
+from SalesLT.SalesOrderDetail
+group by SalesOrderID
+having SUM(OrderQty*UnitPrice) > 200;
+
+20. List of countries and sales made in each country
+select * 
+from SalesLT.Address
+join SalesLT.SalesOrderHeader
+on SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID;
+
 
