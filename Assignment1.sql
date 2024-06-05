@@ -101,4 +101,81 @@ from SalesLT.Address
 join SalesLT.SalesOrderHeader
 on SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID;
 
+21. List of Customer ContactName and number of orders they placed
+select SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName , count(SalesLT.SalesOrderHeader.SalesOrderID) as NumberofOrders
+from SalesLT.Customer
+join SalesLT.SalesOrderHeader
+on SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+group by SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName
+
+22.  List of customer contactnames who have placed more than 3 orders
+select SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName , count(SalesLT.SalesOrderHeader.SalesOrderID) as NumberofOrders
+from SalesLT.Customer
+join SalesLT.SalesOrderHeader
+on SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+group by SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName
+having count(SalesLT.SalesOrderHeader.SalesOrderID) > 3
+
+23. List of discontinued products which were ordered between 1/1/1997 and 1/1/1998
+select SalesLT.Product.Name, SalesLT.Product.DiscontinuedDate , SalesLT.SalesOrderDetail.SalesOrderID, SalesLT.SalesOrderHeader.OrderDate from SalesLT.Product
+join SalesLT.SalesOrderDetail
+on SalesLT.Product.ProductID = SalesLT.SalesOrderDetail.ProductID
+join SalesLT.SalesOrderHeader
+on SalesLT.SalesOrderDetail.SalesOrderID = SalesLT.SalesOrderHeader.SalesOrderID
+where DiscontinuedDate != NULL and OrderDate between '1997-01-01 %' and '1998-01-01%'
+
+24. List of employee firsname, lastName, superviser FirstName, LastName
+SELECT F.FirstName AS Employee_First_Name, F.LastName AS Employee_Last_Name,
+       T.FirstName AS Supervisor_First_Name, T.LastName AS Supervisor_Last_Name
+FROM Employees F
+LEFT JOIN Employees T ON F.ManagerID = T.EmployeeID;
+
+25. List of Employees id and total sale condcuted by employee
+SELECT SalesLT.SalesOrderHeader.EmployeeID, SUM(OrderQty * UnitPrice) AS TotalSales
+FROM saleslt.SalesOrderDetail
+GROUP BY SalesLT.SalesOrderHeader.EmployeeID;
+
+26. list of employees whose FirstName contains character a
+SELECT * FROM dbo.DimEmployee
+WHERE FirstName LIKE '%a%';
+
+27. List of managers who have more than four people reporting to them.
+SELECT EmployeeNationalIDAlternateKey, COUNT(*) AS NumberOfReports
+FROM dbo.DimEmployee
+WHERE Title like '%Manager' and EmployeeNationalIDAlternateKey IS NOT NULL 
+GROUP BY EmployeeNationalIDAlternateKey
+having COUNT(*) AS NumberOfReports > 4;
+
+28. List of Orders and ProductNames
+select SalesLT.Product.Name,SalesLT.SalesOrderDetail.* 
+from SalesLT.Product
+join SalesLT.SalesOrderDetail
+on SalesLT.Product.ProductID = SalesLT.SalesOrderDetail.ProductID
+
+29. List of orders place by the best customer (3 is the no of most orders placed by a single customer)
+select SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName , count(SalesLT.SalesOrderHeader.SalesOrderID) as NumberofOrders
+from SalesLT.Customer
+join SalesLT.SalesOrderHeader
+on SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+group by SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName,SalesLT.Customer.LastName
+having count(SalesLT.SalesOrderHeader.SalesOrderID) > 3
+
+30. List of orders placed by customers who do not have a Fax number
+select saleslt.Customer.FirstName, saleslt.Customer.MiddleName , SalesLT.Customer.lastname
+from SalesLT.Customer
+where SalesLT.Customer.Fax is NULL
+
+31.
+
+
+
+
+
+
+
+
+
+
+
+
 
