@@ -165,7 +165,82 @@ select saleslt.Customer.FirstName, saleslt.Customer.MiddleName , SalesLT.Custome
 from SalesLT.Customer
 where SalesLT.Customer.Fax is NULL
 
-31.
+31. List of Postal codes where the product Tofu was shipped
+SELECT SalesLT.Address.PostalCode
+FROM SalesLT.Address
+JOIN SalesLT.SalesOrderHeader
+ON SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID
+JOIN SalesLT.SalesOrderDetail
+ON SalesLT.SalesOrderHeader.SalesOrderID = SalesLT.SalesOrderDetail.SalesOrderID
+JOIN SalesLT.Product
+ON SalesLT.SalesOrderDetail.ProductID = SalesLT.Product.ProductID
+where SalesLT.Product.Name = 'Tofu'
+
+32. List of product Names that were shipped to France
+select * 
+from SalesLT.Address
+join SalesLT.SalesOrderHeader
+on SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID
+where CountryRegion = 'France' ;
+
+33. List of ProductNames and Categories for the supplier 'Specialty Biscuits, Ltd.'
+SELECT SalesLT.Products.ProductName, SalesLT.Categories.CategoryName
+FROM SalesLT.Products
+JOIN SalesLT.Suppliers ON SalesLT.Products.SupplierID = SalesLT.Suppliers.SupplierID
+JOIN SalesLT.Categories ON SalesLT.Products.CategoryID = SalesLT.Categories.CategoryID
+WHERE SalesLT.Suppliers.CompanyName = 'Specialty Biscuits, Ltd.';
+
+34. List of products that were never ordered
+SELECT *
+FROM SalesLT.Product
+left jOIN SalesLT.SalesOrderDetail
+ON SalesLT.Product.ProductID = SalesLT.SalesOrderDetail.ProductID
+WHERE SalesLT.SalesOrderDetail.ProductID IS NULL;
+
+35. List of products where units in stock is less than 10 and units on order are 0.
+select * from SalesLT.Product
+where SalesLT.Product.UnitsInStock < 10 and SalesLT.ProductUnitsOnOrder = 0;
+
+36. List of top 10 countries by sales
+select TOP 10 SalesLT.Address.CountryRegion from SalesLT.Address
+join SalesLT.SalesOrderHeader
+on SalesLT.Address.AddressID = SalesLT.SalesOrderHeader.ShipToAddressID
+group by SalesLT.Address.CountryRegion
+order by SUM(SalesLT.SalesOrderHeader.SubTotal) desc;
+
+37. Number of orders each employee has taken for customers with CustomerIDs between A and AO
+SELECT SalesLTOrders.EmployeeID, COUNT(*) AS NumberOfOrders
+FROM SalesLT.Orders
+JOIN SalesLTCustomers ON SalesLTOrders.CustomerID = SalesLTCustomers.CustomerID
+WHERE SalesLTCustomers.CustomerID BETWEEN 'A' AND 'AO'
+GROUP BY Orders.EmployeeID;
+
+38. Orderdate of most expensive order
+select TOP 1 SalesLT.SalesOrderHeader.OrderDate from SalesLT.SalesOrderHeader
+order by SalesLT.SalesOrderHeader.SubTotal desc
+
+39. Product name and total revenue from that product
+select SalesLT.Product.Name, SUM(SalesLT.SalesOrderDetail.OrderQty*SalesLT.SalesOrderDetail.UnitPrice) as TotalRevenue 
+from SalesLT.Product
+left join SalesLT.SalesOrderDetail
+on SalesLT.Product.ProductID = SalesLT.SalesOrderDetail.ProductID
+group by SalesLT.Product.Name
+
+40. Supplierid and number of products offered
+select SalesLT.Product.SupplierID, COUNT(*) AS NumberOfProducts
+FROM SalesLT.Product
+GROUP BY SalesLT.Product.SupplierID;
+
+41. Top ten customers based on their business
+select top 10 SalesLT.Customer.FirstName, SalesLT.Customer.MiddleName, SalesLT.Customer.LastName
+from SalesLT.Customer
+left join SalesLT.SalesOrderHeader
+on SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+order by SalesLT.SalesOrderHeader.SubTotal
+
+42. What is the total revenue of the company
+select SUM(SalesLT.SalesOrderHeader.SubTotal) as TotalRevenue
+from SalesLT.SalesOrderHeader
 
 
 
