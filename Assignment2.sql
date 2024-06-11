@@ -45,4 +45,31 @@ raiserror('The order was not placed',16,1)
 end catch
 end
 
+-- Create a procedure UpdateOrderDetails that takes OrderID, ProductID, Unit Price, Quantity, and discount, and updates these values for that ProductID in that Order. All the parameters
+-- except the OrderID and ProductID should be optional so that if the user wants to only update Quantity s/he should be able to do so without providing the rest of the values. You need 
+-- also make sure that if any of the values are being passed in as NULL, then you want to retain the original value instead of overwriting it with NULL. To accomplish this, look for the
+-- ISNULL() function in google or sql server books online. Adjust the UnitsInStock value in products table accordingly.
+
+  create procedure UpdateOrderDetails
+@OrderID int,
+@ProductID int,
+@UnitPrice money = NULL,
+@Quantity int = NULL,
+@Discount money = NULL
+as
+begin
+update SalesLT.SalesOrderDetail
+set UnitPrice= isnull(@UnitPrice,UnitPrice),
+OrderQty=isnull(@Quantity,OrderQty),
+UnitPriceDiscount=isnull(@Discount,UnitPriceDiscount)
+where SalesOrderID = @OrderID and ProductID = @ProductID
+update SalesLT.Product
+set UnitsInStock = UnitsInStock-(select OrderQty from SalesLT.SalesOrderDetail where SalesOrderID=@OrderID and ProductID=@ProductID)
+where ProductID=@ProductID
+if @@ROWCOUNT=0
+raiserror('Not Found',16,1)
+end
+
+
+
 
