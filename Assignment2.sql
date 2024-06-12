@@ -99,4 +99,80 @@ delete from SalesLT.SalesOrderDetail where SalesOrderID=@OrderID and ProductID=@
 return 0;
 end
 
+-- Functions
+-----------------
+
+-- Review SQL Server date formats on this website and then create following functions
+
+-- http://www.sql-server-helper.com/tips/date-formats.aspx
+
+-- Create a function that takes an input parameter type datetime and returns the date in the format MM/DD/YYYY. For example if I pass in 2006-11-21 23:34:05.920', the output of the
+--  functions should be 11/21/2006
+
+create function Formatdate (@datetime datetime)
+returns varchar(10)
+as
+begin
+return convert(varchar(10),convert(date,@datetime),101)
+end
+
+-- Create a function that takes an input parameter type datetime and returns the date in the fonnat YYYYMMDD
+
+create function Formatdate (@datetime datetime)
+returns varchar(10)
+as
+begin
+return convert(varchar(10),convert(date,@datetime),112)
+end
+
+-- Views
+------------------
+
+-- Create a view vwCustomerOrders which returns CompanyName OrderID.OrderDate, ProductID ProductName Quantity UnitPrice.Quantity od. UnitPrice
+
+create view vwCustomerOrders
+as
+select SalesLT.Customer.CompanyName,SalesLT.SalesOrderDetail.SalesOrderID,SalesLT.SalesOrderHeader.OrderDate,SalesLT.Product.Name,SalesLT.SalesOrderDetail.OrderQty,SalesLT.SalesOrderDetail.UnitPrice
+from SalesLT.SalesOrderDetail
+join SalesLT.Product on SalesLT.Product.ProductID = SalesLT.SalesOrderDetail.ProductID
+join SalesLT.SalesOrderHeader on SalesLT.SalesOrderHeader.SalesOrderID = SalesLT.SalesOrderDetail.SalesOrderID
+join SalesLT.Customer on SalesLT.Customer.CustomerID = SalesLT.SalesOrderHeader.CustomerID
+
+-- Use a CREATE VIEW statement to create a view called MyProducts. Your view should contain the ProductID, ProductName, QuantityPerUnit and Unit Price columns from the Products table. It
+-- should also contain the CompanyName column from the Suppliers table and the CategoryName column from the Categories table. Your view should only contain products that are 
+-- not discontinued. 
+
+create view MyProducts 
+as
+select SalesLT.Product.ProductID,SalesLT.Product.Name,SalesLT.Product.QuantityPerUnit,SalesLT.Product.ListPrice,SalesLT.Suppliers.CompanyName,SalesLT.ProductCategory.Name
+from SalesLT.Product
+join SalesLT.Suppliers on SalesLT.Product.SupplierID = SalesLT.Supplier.SupplierID
+join SalesLT.ProductCategory on SalesLT.Product.ProductCategoryID = SalesLT.ProductCategory.ProductCategoryID 
+where SalesLT.Product.DiscontinuedDate is NULL;
+
+-- Triggers
+-------------------
+
+-- If someone cancels an order in northwind database, then you want to delete that order from the Orders table. But you will not be able to delete that Order before deleting the records 
+-- from Order Details table for that particular order due to referential integrity constraints. Create an Instead of Delete trigger on Orders table so that if some one tries to delete an
+-- Order that trigger gets fired and that trigger should first delete everything in order details table and then delete that order from the Orders table
+
+create trigger trg ON SalesLT.SalesOrderDetail instead of delete as
+begin
+    delete from SalesLT.SalesOrderHeader where SalesLT.SalesOrderHeader.SalesOrderID in (select SalesLT.SalesOrderHeader.SalesOrderID  from deleted)
+    delete from SalesLT.SalesOrderDetail where SalesLT.SalesOrderDetail.SalesOrderID in (select SalesLT.SalesOrderDetail.SalesOrderID from deleted)
+end
+
+-- When an order is placed for X units of product Y, we must first check the Products table to ensure that there is sufficient stock to fill the order. This trigger will operate on the
+-- Order Details table. If sufficient stock exists, then fill the order and decrement X units from the UnitsInStock column in Products. If insufficient stock exists, then refuse the order
+-- (le. do not insert it) and notify the user that the order could not be filled because of insufficient stock.
+
+create trigger trg before insert on SalesLT.SalesOrderDetails 
+as
+begin
+    if EXISTS (select 1 from SalesLT.Product where ProductID = INSERTED.ProductId and UnitsInStock < INSERTED.Quantity)
+        rollback transaction;
+end;
+
+
 
