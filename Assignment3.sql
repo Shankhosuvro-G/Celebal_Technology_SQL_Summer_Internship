@@ -251,3 +251,81 @@ left join
     employeecounts ec on c.company_code = ec.company_code
 order by
     c.company_code;
+
+-- Task - 11
+select distinct
+    s.name
+from
+    students s
+join
+    friends f on s.id = f.id
+join
+    packages p1 on f.friend_id = p1.id
+join
+    packages p2 on s.id = p2.id
+where
+    p1.salary > p2.salary
+order by
+    p1.salary;
+
+-- Task - 12
+select
+    jobfamily,
+    country,
+    sum(case when country = 'India' then cost else 0 end) as india_cost,
+    sum(case when country = 'International' then cost else 0 end) as international_cost,
+    (sum(case when country = 'India' then cost else 0 end) / nullif(sum(cost), 0)) * 100 as india_percentage,
+    (sum(case when country = 'International' then cost else 0 end) / nullif(sum(cost), 0)) * 100 as international_percentage
+from
+    yourtable
+group by
+    jobfamily, country;
+
+-- Task - 13
+select bu, 
+       month, 
+       sum(cost) as total_cost, 
+       sum(revenue) as total_revenue, 
+       sum(cost) / nullif(sum(revenue), 0) as cost_revenue_ratio
+from yourtable
+group by bu, month;
+
+-- Task - 14
+select subband, 
+       count(employeeid) as headcount, 
+       (count(employeeid) / (select count(*) from yourtable)) * 100 as percentage_headcount
+from yourtable
+group by subband;
+
+-- Task - 15
+select employeeid, salary
+from yourtable
+fetch first 5 rows only;
+
+-- Task - 16
+update yourtable
+set column1 = column2,
+    column2 = column1;
+
+--Task - 17
+create login prakash with password = 'jyothiprakash@629';
+use yourdatabasename;
+create user balaji for login prakash;
+alter role db_owner add member khizar;
+
+-- Task - 18
+select bu, 
+       month, 
+       sum(cost * employeecount) / sum(employeecount) as weighted_average_cost
+from yourtable
+group by bu, month;
+
+
+-- Task - 19
+select ceil(avg(salary) - avg(nullif(substr(salary, 1, length(salary) - 1), 0))) as salary_error
+from yourtable;
+
+-- Task - 20
+insert into destination_table (column1, column2, ...)
+select column1, column2, ...
+from sourcet_able;
